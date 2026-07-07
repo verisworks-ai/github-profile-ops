@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  GitHub profile README generator — powered by <a href="https://github.com/verisworks-ai/prompt-ops-maker">prompt-ops-maker</a> principles.
+  Make a GitHub profile README in one command — powered by <a href="https://github.com/verisworks-ai/prompt-ops-maker">prompt-ops-maker</a> verification gates.
 </p>
 
 <p align="center">
@@ -19,58 +19,95 @@
 </p>
 
 <p align="center">
+  <a href="README-ko_kr.md">한국어</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#how-it-works">How it works</a> ·
-  <a href="#options">Options</a> ·
-  <a href="#security-boundary">Security</a> ·
-  <a href="README-ko_kr.md">한국어</a>
+  <a href="#security-boundary">Security</a>
 </p>
 
 ---
 
 ## One-line result
 
+```text
+GitHub username in → profile README.md out
 ```
-GitHub API data + profile ops spec → README.md
+
+`github-profile-ops` fetches public GitHub profile data, builds a small profile ops spec, then renders a profile README with interactive sections, stats cards, badges, and setup guidance.
+
+## Why this exists
+
+GitHub profile README setup is confusing for first-time users:
+
+```text
+create a repo with the exact username → make it public → add README.md → push/upload → verify profile page
 ```
+
+This tool turns that into a guided flow.
 
 ## Quick start
 
 ```bash
-# Interactive setup (recommended for first-timers)
+# Interactive setup — recommended for first-time users
 npx --yes --package=@veris.works/github-profile-ops github-profile-ops <username> --interactive
 
 # Preview before writing
 npx --yes --package=@veris.works/github-profile-ops github-profile-ops <username> --dry-run
 
-# Write directly
+# Write README.md in the current directory
 npx --yes --package=@veris.works/github-profile-ops github-profile-ops <username>
 ```
 
-No install required. No API key. Works with any public GitHub account.
+No install. No API key. Node.js 18+ only.
+
+## First-time GitHub setup
+
+After the README is generated, the CLI prints the exact setup guide:
+
+```text
+1. Go to https://github.com/new
+2. Repository name must exactly match your GitHub username
+3. Choose Public
+4. Upload or commit README.md
+5. Open https://github.com/<username> and verify the profile page
+```
 
 ## What it produces
 
-<!-- TODO: add terminal screenshot .github/assets/github-profile-ops-demo.png
-<p align="center">
-  <img src=".github/assets/github-profile-ops-demo.png" width="720" alt="demo output"/>
-</p>
--->
-
 Generated README includes:
-- Animated typing header (capsule-render + readme-typing-svg)
-- Auto-detected repo table (description, language — meta repos filtered)
-- Stack badges from actual repo languages
-- Stats & streak cards (toggleable)
-- Contribution snake (optional)
-- Color theme of your choice
+
+```text
+Animated typing header
+Auto-selected repository cards
+Stack badges from real repo languages
+Profile counter
+Stats and streak cards
+Optional contribution snake
+Theme selector
+Contact section
+```
+
+## Interactive mode
+
+```bash
+npx --yes --package=@veris.works/github-profile-ops github-profile-ops <username> --interactive
+```
+
+Questions:
+
+```text
+1. One-line tagline
+2. Theme: Ocean Blue / Forest Green / Sunset Purple / Minimal Gray
+3. Include Stats & Streak cards?
+4. Include Contribution snake?
+```
 
 ## How it works
 
-```
+```text
 fetchGitHubProfile(<username>)
   ↓
-buildProfileOpsSpec()     ← same structure as prompt-ops-maker
+buildProfileOpsSpec()
   scope · verification gates · output constraints
   ↓
 generateReadme(spec, opts)
@@ -78,11 +115,13 @@ generateReadme(spec, opts)
 README.md
 ```
 
-`--show-spec` to inspect the generated ops spec:
+Inspect the generated ops spec:
 
 ```bash
-npx ... github-profile-ops <username> --show-spec
+npx --yes --package=@veris.works/github-profile-ops github-profile-ops <username> --show-spec
 ```
+
+Example spec:
 
 ```json
 {
@@ -92,48 +131,42 @@ npx ... github-profile-ops <username> --show-spec
 }
 ```
 
-## Interactive mode
-
-```bash
-npx ... github-profile-ops <username> --interactive
-```
-
-Asks 4 questions:
-1. Custom tagline (or use existing bio)
-2. Color theme — Ocean Blue / Forest Green / Sunset Purple / Minimal Gray
-3. Include Stats & Streak cards?
-4. Include Contribution snake?
-
-After generating, prints a step-by-step guide to activate the profile README on GitHub.
-
 ## Options
 
-| Flag | Description |
-|------|-------------|
-| `--interactive`, `-i` | Guided setup with questions |
-| `--dry-run` | Preview to stdout, no file written |
-| `--show-spec` | Print the profile ops spec as JSON |
-| `--output=FILE` | Write to FILE (default: `README.md`) |
+```text
+Flag                 Result
+────────────────────────────────────────────────────────────
+--interactive, -i    Guided setup with questions
+--dry-run            Preview to stdout, no file written
+--show-spec          Print the profile ops spec as JSON
+--output=FILE        Write to FILE instead of README.md
+```
 
 ## Security boundary
 
-- GitHub public API only. No authentication needed.
-- No external LLM calls. All processing is local.
-- File write: only the `--output` path. Default: `README.md` in current directory.
-- `no_secret_echo` gate: tokens and internal paths are excluded from output.
+```text
+GitHub data          Public API only
+API key              Not required
+LLM call             None
+File write           Only --output path, default README.md
+Secret handling      no_secret_echo gate; tokens are not requested
+CI baseline          verisworks-ai reusable security workflow
+```
 
 ## Part of the verisworks-ai pipeline
 
-```
-prompt-ops-maker (write) → vibecodecheck (audit) → MCP servers (serve)
-        ↑
-github-profile-ops — profile README, same ops-spec structure
+```text
+prompt-ops-maker (write) → github-profile-ops (profile) → vibecodecheck (audit)
+        ↓
+MCP servers (serve structured checks)
 ```
 
 ## Requirements
 
-- Node.js 18+
-- Internet connection (GitHub API)
+```text
+Node.js >= 18
+Internet connection for GitHub public API
+```
 
 ## License
 
