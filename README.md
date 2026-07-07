@@ -22,7 +22,8 @@
   <a href="#quick-start">Quick start</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#options">Options</a> ·
-  <a href="#security-boundary">Security</a>
+  <a href="#security-boundary">Security</a> ·
+  <a href="README-ko_kr.md">한국어</a>
 </p>
 
 ---

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "GitHub profile README generator powered by prompt-ops-maker principles",
   "type": "module",
+  "author": "veris <hello@veris.kr>",
   "bin": {
     "github-profile-ops": "./src/index.js"
   },
@@ -13,6 +14,7 @@
     "node": ">=18"
   },
   "keywords": ["github", "profile", "readme", "generator", "prompt-ops", "mcp"],
+  "author": "veris <hello@veris.kr>",
   "license": "MIT",
   "repository": {
     "type": "git",
