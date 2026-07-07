@@ -11,7 +11,13 @@ const LANG_COLORS = {
   Shell:      { bg: '4EAA25', logo: 'gnubash',      text: 'white' }
 };
 
-export function generateReadme(spec) {
+const DEFAULT_THEME = { header: '0:0F172A,50:1E3A5F,100:0EA5E9', accent: '0EA5E9', fire: '10B981', ring: '0EA5E9' };
+
+export function generateReadme(spec, opts = {}) {
+  const theme = opts.theme || DEFAULT_THEME;
+  const tagline = opts.tagline;
+  const includeStats = opts.includeStats !== false;
+  const includeSnake = opts.includeSnake || false;
   const { subject, context } = spec;
   const { featuredRepos, topLanguages } = context;
 
@@ -34,22 +40,50 @@ export function generateReadme(spec) {
     ? `<a href="mailto:${subject.email}"><img src="https://img.shields.io/badge/${encodeLabel(subject.email)}-64748B?style=flat-square" alt="email"/></a>\n  `
     : '';
 
-  const typingLines = buildTypingLines(subject);
+  const bioText = tagline || subject.bio || '';
+  const typingLines = buildTypingLines(subject, tagline);
   const connectLines = buildConnectLines(subject, featuredRepos);
 
+  const statsSection = includeStats ? `---
+
+## Stats
+
+<p align="center">
+  <img src="https://github-profile-summary-cards.vercel.app/api/cards/stats?username=${subject.login}&theme=tokyonight" height="165" alt="GitHub stats"/>
+  <img src="https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=${subject.login}&theme=tokyonight" height="165" alt="Top languages"/>
+</p>
+
+<p align="center">
+  <img src="https://streak-stats.demolab.com/?user=${subject.login}&theme=tokyonight&hide_border=true&background=0F172A&ring=${theme.ring}&fire=${theme.fire}&currStreakLabel=${theme.accent}" alt="Streak stats"/>
+</p>
+
+` : '';
+
+  const snakeSection = includeSnake ? `---
+
+## Contribution snake
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/${subject.login}/${subject.login}/output/github-snake-dark.svg"/>
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/${subject.login}/${subject.login}/output/github-snake.svg"/>
+  <img src="https://raw.githubusercontent.com/${subject.login}/${subject.login}/output/github-snake.svg" alt="Contribution snake" width="100%"/>
+</picture>
+
+` : '';
+
   return `<p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0F172A,50:1E3A5F,100:0EA5E9&height=140&section=header" width="100%"/>
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=${theme.header}&height=140&section=header" width="100%"/>
 </p>
 
 <p align="center">
   <a href="${subject.blog || `https://github.com/${subject.login}`}">
-    <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=28&duration=4000&pause=2000&color=0EA5E9&center=true&vCenter=true&width=640&height=60&lines=${typingLines}" alt="${subject.login}"/>
+    <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=28&duration=4000&pause=2000&color=${theme.accent}&center=true&vCenter=true&width=640&height=60&lines=${typingLines}" alt="${subject.login}"/>
   </a>
 </p>
 
-${subject.bio ? `<p align="center">\n  ${subject.bio}\n</p>\n` : ''}
+${bioText ? `<p align="center">\n  ${bioText}\n</p>\n` : ''}
 <p align="center">
-  ${blogBadge}${emailBadge}<img src="https://komarev.com/ghpvc/?username=${subject.login}&color=0EA5E9&style=flat-square" alt="profile views"/>
+  ${blogBadge}${emailBadge}<img src="https://komarev.com/ghpvc/?username=${subject.login}&color=${theme.accent}&style=flat-square" alt="profile views"/>
 </p>
 
 ---
@@ -68,27 +102,14 @@ ${repoRows}
 ${langBadges}
 </p>
 
----
-
-## Stats
-
-<p align="center">
-  <img src="https://github-profile-summary-cards.vercel.app/api/cards/stats?username=${subject.login}&theme=tokyonight" height="165" alt="GitHub stats"/>
-  <img src="https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=${subject.login}&theme=tokyonight" height="165" alt="Top languages"/>
-</p>
-
-<p align="center">
-  <img src="https://streak-stats.demolab.com/?user=${subject.login}&theme=tokyonight&hide_border=true&background=0F172A&ring=0EA5E9&fire=10B981&currStreakLabel=0EA5E9" alt="Streak stats"/>
-</p>
-
----
+${statsSection}${snakeSection}---
 
 ## Connect
 
 ${connectLines}
 
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0EA5E9,50:1E3A5F,100:0F172A&height=100&section=footer" width="100%"/>
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:${theme.accent},50:1E3A5F,100:0F172A&height=100&section=footer" width="100%"/>
 </p>
 `;
 }
@@ -97,10 +118,11 @@ function encodeLabel(s) {
   return encodeURIComponent(s.replace(/^https?:\/\//, '').replace(/\/$/, ''));
 }
 
-function buildTypingLines(subject) {
+function buildTypingLines(subject, tagline) {
   const lines = [subject.login];
-  if (subject.bio && subject.bio.length < 60) lines.push(subject.bio);
-  else if (subject.name && subject.name !== subject.login) lines.push(subject.name);
+  const sub = tagline || (subject.bio && subject.bio.length < 60 ? subject.bio : null)
+    || (subject.name && subject.name !== subject.login ? subject.name : null);
+  if (sub) lines.push(sub);
   return lines.map(l => encodeURIComponent(l)).join(';');
 }
 
