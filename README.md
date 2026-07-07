@@ -1,80 +1,143 @@
-# github-profile-ops
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0F172A,50:1E3A5F,100:0EA5E9&height=120&section=header" width="100%"/>
+</p>
 
-GitHub 프로필 README 생성기 — [prompt-ops-maker](https://github.com/verisworks-ai/prompt-ops-maker) 원칙 적용.
+<p align="center">
+  <strong style="font-size:1.4em;">github-profile-ops</strong>
+</p>
 
-GitHub API에서 실제 데이터를 가져와 **profile ops spec** (scope + verification gates + output constraints)을 생성하고, 그 스펙으로 README를 렌더링한다. API 키 없이 동작.
+<p align="center">
+  GitHub profile README generator — powered by <a href="https://github.com/verisworks-ai/prompt-ops-maker">prompt-ops-maker</a> principles.
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@veris.works/github-profile-ops"><img src="https://img.shields.io/npm/v/@veris.works/github-profile-ops?style=flat-square&color=0EA5E9" alt="npm version"/></a>
+  <img src="https://img.shields.io/badge/node-%3E%3D18-green?style=flat-square" alt="Node 18+"/>
+  <img src="https://img.shields.io/badge/deps-zero-10B981?style=flat-square" alt="zero deps"/>
+  <img src="https://img.shields.io/badge/API%20key-not%20required-64748B?style=flat-square" alt="no API key"/>
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" alt="MIT"/>
+</p>
+
+<p align="center">
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#how-it-works">How it works</a> ·
+  <a href="#options">Options</a> ·
+  <a href="#security-boundary">Security</a>
+</p>
+
+---
 
 ## One-line result
 
 ```
-github-profile-ops = GitHub API data + profile ops spec → README.md
+GitHub API data + profile ops spec → README.md
 ```
 
 ## Quick start
 
 ```bash
-# npx (no install)
-npx --yes --package=@veris.works/github-profile-ops github-profile-ops <username>
+# Interactive setup (recommended for first-timers)
+npx --yes --package=@veris.works/github-profile-ops github-profile-ops <username> --interactive
 
-# dry-run (stdout only)
+# Preview before writing
 npx --yes --package=@veris.works/github-profile-ops github-profile-ops <username> --dry-run
 
-# show the generated ops spec
-npx --yes --package=@veris.works/github-profile-ops github-profile-ops <username> --show-spec
-
-# write to file
-npx --yes --package=@veris.works/github-profile-ops github-profile-ops <username> --output=README.md
+# Write directly
+npx --yes --package=@veris.works/github-profile-ops github-profile-ops <username>
 ```
+
+No install required. No API key. Works with any public GitHub account.
+
+## What it produces
+
+<!-- TODO: add terminal screenshot .github/assets/github-profile-ops-demo.png
+<p align="center">
+  <img src=".github/assets/github-profile-ops-demo.png" width="720" alt="demo output"/>
+</p>
+-->
+
+Generated README includes:
+- Animated typing header (capsule-render + readme-typing-svg)
+- Auto-detected repo table (description, language — meta repos filtered)
+- Stack badges from actual repo languages
+- Stats & streak cards (toggleable)
+- Contribution snake (optional)
+- Color theme of your choice
 
 ## How it works
 
 ```
-GitHub API (/users/:username + /repos)
+fetchGitHubProfile(<username>)
   ↓
-profile ops spec (scope · verification gates · output constraints)
+buildProfileOpsSpec()     ← same structure as prompt-ops-maker
+  scope · verification gates · output constraints
+  ↓
+generateReadme(spec, opts)
   ↓
 README.md
 ```
 
-`--show-spec` 플래그로 spec을 직접 확인할 수 있다:
+`--show-spec` to inspect the generated ops spec:
+
+```bash
+npx ... github-profile-ops <username> --show-spec
+```
 
 ```json
 {
-  "scope": "Generate a GitHub profile README for verisworks-ai",
-  "gates": [
-    "no_unverified_claims",
-    "no_marketing_hype",
-    "result_first",
-    "no_secret_echo",
-    "verification_aware"
-  ],
+  "scope": "Generate a GitHub profile README for <username>",
+  "gates": ["no_unverified_claims", "no_marketing_hype", "result_first", "no_secret_echo"],
   "output": { "format": "github_flavored_markdown", "style": "verification-first" }
 }
 ```
 
-이 구조는 [prompt-ops-maker](https://github.com/verisworks-ai/prompt-ops-maker)가 AI 에이전트 운영 프롬프트를 생성하는 방식과 동일하다. prompt to production 파이프라인의 첫 단계.
+## Interactive mode
 
-## Requirements
+```bash
+npx ... github-profile-ops <username> --interactive
+```
 
-- Node.js 18+
-- 인터넷 연결 (GitHub API 호출)
-- API 키 불필요
+Asks 4 questions:
+1. Custom tagline (or use existing bio)
+2. Color theme — Ocean Blue / Forest Green / Sunset Purple / Minimal Gray
+3. Include Stats & Streak cards?
+4. Include Contribution snake?
+
+After generating, prints a step-by-step guide to activate the profile README on GitHub.
+
+## Options
+
+| Flag | Description |
+|------|-------------|
+| `--interactive`, `-i` | Guided setup with questions |
+| `--dry-run` | Preview to stdout, no file written |
+| `--show-spec` | Print the profile ops spec as JSON |
+| `--output=FILE` | Write to FILE (default: `README.md`) |
 
 ## Security boundary
 
-- GitHub 공개 API만 사용. 인증 불필요.
-- 파일 쓰기: `--output` 지정 경로 한 개만. 기본값 `README.md` (현재 디렉토리).
-- 외부 LLM 호출 없음. 분석은 로컬에서만.
-- 민감 정보(토큰·내부 경로)는 spec `no_secret_echo` 게이트로 차단.
+- GitHub public API only. No authentication needed.
+- No external LLM calls. All processing is local.
+- File write: only the `--output` path. Default: `README.md` in current directory.
+- `no_secret_echo` gate: tokens and internal paths are excluded from output.
 
 ## Part of the verisworks-ai pipeline
 
 ```
 prompt-ops-maker (write) → vibecodecheck (audit) → MCP servers (serve)
         ↑
-github-profile-ops — profile README generation with ops-spec structure
+github-profile-ops — profile README, same ops-spec structure
 ```
+
+## Requirements
+
+- Node.js 18+
+- Internet connection (GitHub API)
 
 ## License
 
-MIT
+MIT — [verisworks-ai](https://github.com/verisworks-ai)
+
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0EA5E9,50:1E3A5F,100:0F172A&height=80&section=footer" width="100%"/>
+</p>
