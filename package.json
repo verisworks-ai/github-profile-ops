@@ -1,11 +1,11 @@
 {
   "name": "@veris.works/github-profile-ops",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "GitHub profile README generator powered by prompt-ops-maker principles",
   "type": "module",
   "author": "veris <hello@veris.kr>",
   "bin": {
-    "github-profile-ops": "./src/index.js"
+    "github-profile-ops": "src/index.js"
   },
   "scripts": {
     "test": "node --test test/*.test.js"
@@ -13,10 +13,17 @@
   "engines": {
     "node": ">=18"
   },
-  "keywords": ["github", "profile", "readme", "generator", "prompt-ops", "mcp"],
+  "keywords": [
+    "github",
+    "profile",
+    "readme",
+    "generator",
+    "prompt-ops",
+    "mcp"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/verisworks-ai/github-profile-ops.git"
+    "url": "git+https://github.com/verisworks-ai/github-profile-ops.git"
   }
 }
