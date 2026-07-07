@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  security:
+    uses: verisworks-ai/.github/.github/workflows/security-baseline.yml@main
+    with:
+      language: node
+
+  test:
+    runs-on: ubuntu-latest
+    needs: security
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Smoke test — dry-run verisworks-ai
+        run: node src/index.js verisworks-ai --dry-run | grep -q "verisworks-ai"
+
+      - name: Smoke test — unknown user exits 1
+        run: |
+          node src/index.js __no_such_user_xyz_abc__ --dry-run && exit 1 || true
+
+      - name: Verify no external deps
+        run: |
+          [ ! -f package-lock.json ] || node -e "const l=require('./package-lock.json'); const deps=Object.keys(l.packages||{}).filter(k=>k&&k!==''); if(deps.length>0){console.error('unexpected deps:',deps);process.exit(1);}"
